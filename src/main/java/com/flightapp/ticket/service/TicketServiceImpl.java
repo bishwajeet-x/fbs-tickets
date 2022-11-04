@@ -123,7 +123,7 @@ public class TicketServiceImpl implements TicketService {
 	@Override
 	public FlightDto getFlightData(long flightId) {
 		RestTemplate restTemplate = new RestTemplate();
-		ResponseEntity<FlightSchedule> flight = restTemplate.exchange("http://localhost:8080/api/flights/search?id="+flightId, 
+		ResponseEntity<FlightSchedule> flight = restTemplate.exchange("http://fbs-as.ap-south-1.elasticbeanstalk.com/api/flights/search?id="+flightId, 
 				HttpMethod.GET, null, 
 				FlightSchedule.class);
 		
