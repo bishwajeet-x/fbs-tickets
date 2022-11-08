@@ -1,31 +1,35 @@
 package com.flightapp.ticket.dto;
 
+import java.util.Collection;
 import java.util.Date;
+
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+
 
 public class FlightDto {
 	
-	private long flightId;
-	
+	private String flightCode;
 	private AirlineDto airline;
 	
-	private Date scheduledFor;
-	
-	private int scheduledTimeHour;
-	private int scheduledTimeMinutes;
+	private Date sta;
+	private Date eta;
+	private int flightHours;
 	
 	private String source;
 	private String destination;
 	
-	private double price;
+	private Collection<FlightClass> flightClass;
 	
 	private FlightStatus status;
 
-	public long getFlightId() {
-		return flightId;
+	public String getFlightCode() {
+		return flightCode;
 	}
 
-	public void setFlightId(long flightId) {
-		this.flightId = flightId;
+	public void setFlightCode(String flightCode) {
+		this.flightCode = flightCode;
 	}
 
 	public AirlineDto getAirline() {
@@ -36,28 +40,28 @@ public class FlightDto {
 		this.airline = airline;
 	}
 
-	public Date getScheduledFor() {
-		return scheduledFor;
+	public Date getSta() {
+		return sta;
 	}
 
-	public void setScheduledFor(Date scheduledFor) {
-		this.scheduledFor = scheduledFor;
+	public void setSta(Date sta) {
+		this.sta = sta;
 	}
 
-	public int getScheduledTimeHour() {
-		return scheduledTimeHour;
+	public Date getEta() {
+		return eta;
 	}
 
-	public void setScheduledTimeHour(int scheduledTimeHour) {
-		this.scheduledTimeHour = scheduledTimeHour;
+	public void setEta(Date eta) {
+		this.eta = eta;
 	}
 
-	public int getScheduledTimeMinutes() {
-		return scheduledTimeMinutes;
+	public int getFlightHours() {
+		return flightHours;
 	}
 
-	public void setScheduledTimeMinutes(int scheduledTimeMinutes) {
-		this.scheduledTimeMinutes = scheduledTimeMinutes;
+	public void setFlightHours(int flightHours) {
+		this.flightHours = flightHours;
 	}
 
 	public String getSource() {
@@ -76,12 +80,12 @@ public class FlightDto {
 		this.destination = destination;
 	}
 
-	public double getPrice() {
-		return price;
+	public Collection<FlightClass> getFlightClass() {
+		return flightClass;
 	}
 
-	public void setPrice(double price) {
-		this.price = price;
+	public void setFlightClass(Collection<FlightClass> flightClass) {
+		this.flightClass = flightClass;
 	}
 
 	public FlightStatus getStatus() {
@@ -94,10 +98,9 @@ public class FlightDto {
 
 	@Override
 	public String toString() {
-		return "FlightDto [flightId=" + flightId + ", airline=" + airline + ", scheduledFor=" + scheduledFor
-				+ ", scheduledTimeHour=" + scheduledTimeHour + ", scheduledTimeMinutes=" + scheduledTimeMinutes
-				+ ", source=" + source + ", destination=" + destination + ", price=" + price + ", status=" + status
-				+ "]";
+		return "FlightSchedule [flightCode=" + flightCode + ", airline=" + airline + ", sta=" + sta + ", eta=" + eta
+				+ ", flightHours=" + flightHours + ", source=" + source + ", destination=" + destination
+				+ ", flightClass=" + flightClass + ", status=" + status + "]";
 	}
 }
 
@@ -122,4 +125,29 @@ class FlightStatus {
 		return "FlightStatus [id=" + id + ", status=" + status + "]";
 	}
 	
+}
+
+class FlightClass {
+	private long classId;
+	
+	private String name;
+	private double fare;
+	
+	public String getName() {
+		return name;
+	}
+	public void setName(String name) {
+		this.name = name;
+	}
+	public double getFare() {
+		return fare;
+	}
+	public void setFare(double fare) {
+		this.fare = fare;
+	}
+	
+	@Override
+	public String toString() {
+		return "FlightClass [name=" + name + ", fare=" + fare + "]";
+	}
 }

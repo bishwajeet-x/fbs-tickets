@@ -11,10 +11,10 @@ import com.flightapp.ticket.entity.Ticket;
 
 public interface TicketService {
 
-	public Ticket cancelTicket(String pnr);
+	public TicketResponseDto cancelTicket(String pnr, String flightUrl);
 	public TicketResponseDto bookTicket(TicketDto bookingReq, FlightDto flightDetails);
-	public Ticket searchTicket(String pnr);
+	public TicketResponseDto searchTicket(String pnr, String flightUrl);
 	public List<Passenger> fetchPassengers(long flightId);
-	public FlightDto getFlightData(long flightId);
-	public List<TicketResponseDto> getTicketHistory(TicketHistoryParam param);
+	public FlightDto getFlightData(String flightId, String flightUrl);
+	public List<TicketResponseDto> getTicketHistory(TicketHistoryParam param, String flightUrl);
 }

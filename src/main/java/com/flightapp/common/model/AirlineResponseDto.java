@@ -1,9 +1,9 @@
-package com.flightapp.ticket.dto;
+package com.flightapp.common.model;
 
 import java.util.ArrayList;
 import java.util.Collection;
 
-public class AirlineDto {
+public class AirlineResponseDto {
 	
 	private long airlineId;
 	private String airlineName;
@@ -11,9 +11,9 @@ public class AirlineDto {
 	private boolean mealAvailable;
 	private Collection<MealType> mealType = new ArrayList<>();
 	private AirlineStatus airlineStatus;
-	public AirlineDto() {}
+	public AirlineResponseDto() {}
 
-	public AirlineDto(String airlineName, int noOfSeats, boolean mealAvailable,
+	public AirlineResponseDto(String airlineName, int noOfSeats, boolean mealAvailable,
 			Collection<MealType> mealType, AirlineStatus airlineStatus) {
 		this.airlineName = airlineName;
 		this.noOfSeats = noOfSeats;
@@ -78,58 +78,3 @@ public class AirlineDto {
 				+ "]";
 	}
 }
-
-class AirlineStatus {
-	private int id;
-	private String status;
-	
-	public int getId() {
-		return id;
-	}
-	public void setId(int id) {
-		this.id = id;
-	}
-	public String getStatus() {
-		return status;
-	}
-	public void setStatus(String status) {
-		this.status = status;
-	}
-	
-	@Override
-	public String toString() {
-		return "AirlineStatus [id=" + id + ", status=" + status + "]";
-	}
-}
-
-class MealType {
-	
-	private int typeId;
-	private String typeName;
-	
-	public int getTypeId() {
-		return typeId;
-	}
-	public void setTypeId(int typeId) {
-		this.typeId = typeId;
-	}
-	public String getTypeName() {
-		return typeName;
-	}
-	public void setTypeName(String typeName) {
-		this.typeName = typeName;
-	}
-	
-	public MealType() {}
-	
-	public MealType(String typeName) {
-		this.typeName = typeName;
-	}
-	
-	@Override
-	public String toString() {
-		return "MealType [typeId=" + typeId + ", typeName=" + typeName + "]";
-	}
-	
-}
-

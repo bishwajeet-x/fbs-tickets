@@ -18,7 +18,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.flightapp.common.exception.GenericException;
 import com.flightapp.common.exception.NotFoundException;
 import com.flightapp.common.exception.SomethingWentWrong;
-import com.flightapp.common.model.DefaultResponse;
 import com.flightapp.common.model.FlightSchedule;
 import com.flightapp.ticket.dto.FlightDto;
 import com.flightapp.ticket.dto.TicketDto;
@@ -38,9 +37,9 @@ public class TicketServiceImpl implements TicketService {
 	SimpleDateFormat sdf = new SimpleDateFormat();
 
 	@Override
-	public Ticket cancelTicket(String pnr) {
-		Ticket ticket = searchTicket(pnr);
-		FlightDto flight = getFlightData(ticket.getFlightId());
+	public TicketResponseDto cancelTicket(String pnr, String flightUrl) {
+		TicketResponseDto ticket = searchTicket(pnr, flightUrl);
+		FlightDto flight = getFlightData(ticket.getFlight().getFlightCode(), flightUrl);
 		Date today = null;
 		try {
 			today = sdf.parse(sdf.format(new Date()));
@@ -48,13 +47,18 @@ public class TicketServiceImpl implements TicketService {
 			e.printStackTrace();
 		}
 		
-		long diff = Math.abs(today.getTime() - flight.getScheduledFor().getTime());
+		long diff = Math.abs(today.getTime() - flight.getSta().getTime());
 	    long hours = TimeUnit.HOURS.convert(diff, TimeUnit.MILLISECONDS);
 	    
-	    if(hours > 24) {
-	    	ticket.setStatus("CANCELLED");
+	    if(hours < 24) {
+	    	ticket.getTicket().setStatus("CANCELLED");
 	    	try {
-	    		return ticketRepo.save(ticket);
+	    		Ticket cancelled = ticketRepo.save(ticket.getTicket());
+	    		TicketResponseDto response = new TicketResponseDto();
+	    		response.setFlight(ticket.getFlight());
+	    		response.setPassengers(ticket.getPassengers());
+	    		response.setTicket(cancelled);
+	    		return response;
 	    	} catch(Exception e) {
 	    		e.printStackTrace();
 	    		throw new SomethingWentWrong("Failed to cancel ticket!");
@@ -72,15 +76,20 @@ public class TicketServiceImpl implements TicketService {
 		ticket.setEmail(bookingReq.getEmail());
 		ticket.setMeal(bookingReq.getMeal());
 		ticket.setFlightId(bookingReq.getFlightId());
-		ticket.setNumberOfSeats(bookingReq.getPassengers().size());
-		ticket.setPnr(ticket.getName().substring(0, 2).concat(flightDetails.getAirline().getAirlineName().concat(String.valueOf(System.currentTimeMillis()))));
+		ticket.setNumberOfSeats(bookingReq.getNumberOfSeats());
+		ticket.setFare(bookingReq.getFare());
+		ticket.setFlightClass(bookingReq.getFlightClass());
+		ticket.setPnr(ticket.getName().substring(0, 2).concat(flightDetails.getFlightCode().substring(0, 4).concat(String.valueOf(System.currentTimeMillis()))));
 		ticket.setStatus("BOOKED");
+		ticket.setUsername(bookingReq.getUsername());
+		
+		bookingReq.getPassengers().add(new Passenger(bookingReq.getName(), bookingReq.getGender(), bookingReq.getAge()));
 		
 		TicketResponseDto response = new TicketResponseDto();
 		List<Passenger> passengers = new ArrayList<>();
 		try {
 			ticketRepo.save(ticket);
-			
+			System.out.println("Inside try after save");
 			try {
 				bookingReq.getPassengers().forEach(p -> {
 					Passenger passenger = new Passenger();
@@ -97,22 +106,28 @@ public class TicketServiceImpl implements TicketService {
 				response.setPassengers(passengers);
 				return response;
 			} catch (Exception e) {
+				e.printStackTrace();
 				throw new SomethingWentWrong("Could not book ticket!");
 			}
 			
 		} catch(Exception e) {
+			e.printStackTrace();
 			throw new SomethingWentWrong("Could not book ticket!");
 		}
 		
 	}
 
 	@Override
-	public Ticket searchTicket(String pnr) {
+	public TicketResponseDto searchTicket(String pnr, String flightUrl) {
+		TicketResponseDto response = new TicketResponseDto();
 		Optional<Ticket> ticket = ticketRepo.findByPnr(pnr);
 		if(ticket.isEmpty()) {
 			throw new NotFoundException("NotFoundException: Invalid PNR!");
 		}
-		return ticket.get();
+		response.setTicket(ticket.get());
+		response.setFlight(getFlightData(ticket.get().getFlightId(), flightUrl));
+		response.setPassengers(fetchPassengers(ticket.get().getTicketId()));
+		return response;
 	}
 
 	@Override
@@ -121,15 +136,16 @@ public class TicketServiceImpl implements TicketService {
 	}
 
 	@Override
-	public FlightDto getFlightData(long flightId) {
+	public FlightDto getFlightData(String flightId, String flightUrl) {
 		RestTemplate restTemplate = new RestTemplate();
-		ResponseEntity<FlightSchedule> flight = restTemplate.exchange("http://fbs-as.ap-south-1.elasticbeanstalk.com/api/flights/search?id="+flightId, 
+		ResponseEntity<FlightSchedule> flight = restTemplate.exchange(flightUrl+"search?id="+flightId, 
 				HttpMethod.GET, null, 
 				FlightSchedule.class);
 		
 		if(flight.getStatusCodeValue() != 200) {
 			throw new NotFoundException("NotFoundException: Flight id "+flightId+" does not exist");
 		}
+		System.err.println(flight.getBody().toString());
 		
 		ObjectMapper mapper = new ObjectMapper();
 		try {
@@ -140,8 +156,8 @@ public class TicketServiceImpl implements TicketService {
 	}
 
 	@Override
-	public List<TicketResponseDto> getTicketHistory(TicketHistoryParam param) {
-		Optional<List<Ticket>> tickets = ticketRepo.findByEmail(param.getEmail());
+	public List<TicketResponseDto> getTicketHistory(TicketHistoryParam param, String flightUrl) {
+		Optional<List<Ticket>> tickets = ticketRepo.findByUsername(param.getUsername());
 		if(tickets.isEmpty()) {
 			throw new NotFoundException("NotFoundException: No tickets available with this email!");
 		}
@@ -151,7 +167,7 @@ public class TicketServiceImpl implements TicketService {
 		tickets.get().stream().forEach(ticket -> {
 			TicketResponseDto response = new TicketResponseDto();
 			response.setTicket(ticket);
-			response.setFlight(getFlightData(ticket.getFlightId()));
+			response.setFlight(getFlightData(ticket.getFlightId(), flightUrl));
 			response.setPassengers(fetchPassengers(ticket.getTicketId()));
 			allTickets.add(response);
 		});

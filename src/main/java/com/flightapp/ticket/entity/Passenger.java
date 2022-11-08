@@ -21,6 +21,14 @@ public class Passenger {
 	
 	@OneToOne(fetch = FetchType.EAGER)
 	private Ticket ticket;
+	
+	public Passenger() {}
+
+	public Passenger(String name, String gender, int age) {
+		this.name = name;
+		this.gender = gender;
+		this.age = age;
+	}
 
 	public long getPassengerId() {
 		return passengerId;

@@ -8,12 +8,17 @@ public class TicketDto {
 
 	private long ticketId;
 	private String name;
+	private int age;
+	private String gender;
 	private String email;
 	private String meal;
-	private long flightId;
+	private String flightId;
 	private String pnr;
+	private Double fare;
+	private int numberOfSeats;
+	private String flightClass;
 	private List<Passenger> passengers;
-	
+	private String username;
 	public long getTicketId() {
 		return ticketId;
 	}
@@ -25,6 +30,18 @@ public class TicketDto {
 	}
 	public void setName(String name) {
 		this.name = name;
+	}
+	public int getAge() {
+		return age;
+	}
+	public void setAge(int age) {
+		this.age = age;
+	}
+	public String getGender() {
+		return gender;
+	}
+	public void setGender(String gender) {
+		this.gender = gender;
 	}
 	public String getEmail() {
 		return email;
@@ -38,11 +55,35 @@ public class TicketDto {
 	public void setMeal(String meal) {
 		this.meal = meal;
 	}
+	public String getFlightId() {
+		return flightId;
+	}
+	public void setFlightId(String flightId) {
+		this.flightId = flightId;
+	}
 	public String getPnr() {
 		return pnr;
 	}
 	public void setPnr(String pnr) {
 		this.pnr = pnr;
+	}
+	public Double getFare() {
+		return fare;
+	}
+	public void setFare(Double fare) {
+		this.fare = fare;
+	}
+	public int getNumberOfSeats() {
+		return numberOfSeats;
+	}
+	public void setNumberOfSeats(int numberOfSeats) {
+		this.numberOfSeats = numberOfSeats;
+	}
+	public String getFlightClass() {
+		return flightClass;
+	}
+	public void setFlightClass(String flightClass) {
+		this.flightClass = flightClass;
 	}
 	public List<Passenger> getPassengers() {
 		return passengers;
@@ -50,17 +91,17 @@ public class TicketDto {
 	public void setPassengers(List<Passenger> passengers) {
 		this.passengers = passengers;
 	}
-	
-	public long getFlightId() {
-		return flightId;
+	public String getUsername() {
+		return username;
 	}
-	public void setFlightId(long flightId) {
-		this.flightId = flightId;
+	public void setUsername(String username) {
+		this.username = username;
 	}
 	@Override
 	public String toString() {
-		return "TicketDto [ticketId=" + ticketId + ", name=" + name + ", email=" + email + ", meal=" + meal
-				+ ", flightId=" + flightId + ", pnr=" + pnr + ", passengers=" + passengers + "]";
+		return "TicketDto [ticketId=" + ticketId + ", name=" + name + ", age=" + age + ", gender=" + gender + ", email="
+				+ email + ", meal=" + meal + ", flightId=" + flightId + ", pnr=" + pnr + ", fare=" + fare
+				+ ", numberOfSeats=" + numberOfSeats + ", flightClass=" + flightClass + ", passengers=" + passengers
+				+ ", username=" + username + "]";
 	}
-	
 }
